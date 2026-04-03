@@ -1,46 +1,134 @@
-# Astro Starter Kit: Basics
+# Antar Logs
 
-```sh
-npm create astro@latest -- --template basics
+A minimal, text-first technical blog built with Astro.
+
+The focus is fast loading, clean writing, and strong crawlability:
+
+- Client-side post search
+- Tag filtering and tag archive pages
+- Previous and next post navigation
+- Related post links (tag-based)
+- RSS feed and sitemap
+- SEO-first metadata and canonical URLs
+- Custom 404 page
+
+## Live Site
+
+https://www.antarlogs.tech
+
+## Tech Stack
+
+- Astro 6
+- Astro Content Collections
+- @astrojs/sitemap
+- @astrojs/rss
+- reading-time
+
+## Local Development
+
+Requirements:
+
+- Node.js >= 22.12.0
+
+Install dependencies:
+
+```bash
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Run the dev server:
 
-## 🚀 Project Structure
+```bash
+npm run dev
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview production build:
+
+```bash
+npm run preview
+```
+
+## Project Structure
 
 ```text
-/
+.
 ├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+│   ├── favicon assets
+│   ├── robots.txt
+│   └── site.webmanifest
+├── src/
+│   ├── content/
+│   │   └── blog/*.md
+│   ├── layouts/
+│   │   ├── BaseLayout.astro
+│   │   └── Layout.astro
+│   ├── pages/
+│   │   ├── 404.astro
+│   │   ├── index.astro
+│   │   ├── rss.xml.ts
+│   │   ├── blog/[...slug].astro
+│   │   └── tags/[tag].astro
+│   └── styles/global.css
+├── astro.config.mjs
+└── src/content.config.ts
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Writing Posts
 
-## 🧞 Commands
+Add markdown files in:
 
-All commands are run from the root of the project, from a terminal:
+```text
+src/content/blog/
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Each post must include frontmatter:
 
-## 👀 Want to learn more?
+```yaml
+---
+title: "Your post title"
+date: 2026-04-03
+description: "A short summary for SEO and listings"
+tags: ["astro", "backend", "notes"]
+---
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## SEO and Discovery
+
+This project is already set up with:
+
+- Canonical URLs
+- Meta description tags
+- Open Graph and Twitter tags
+- robots.txt
+- Sitemap generation via @astrojs/sitemap
+- RSS feed at /rss.xml
+
+After deployment, submit your sitemap in Google Search Console:
+
+```text
+https://www.antarlogs.tech/sitemap-index.xml
+```
+
+## Blog UX Features
+
+- Homepage search by title, description, and tags
+- Tag dropdown filtering
+- Tag-specific archive pages
+- Related posts section on article pages
+- Newer and older post navigation on article pages
+
+## Design Philosophy
+
+No heavy UI framework. No visual noise.
+
+Just semantic HTML, accessible structure, and Sakura-style global CSS for a classic old-web reading experience.
+
+## License
+
+MIT (or your preferred license)

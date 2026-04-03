@@ -1,0 +1,151 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { render } from "astro:content";
+import { getCollection } from "astro:content";
+import readingTime from "reading-time";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("blog");
+  return allPosts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: CollectionEntry<"blog"> };
+const { Content } = await render(post);
+
+const sortedPosts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const currentIndex = sortedPosts.findIndex((entry) => entry.id === post.id);
+const newerPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : undefined;
+const olderPost =
+  currentIndex >= 0 && currentIndex < sortedPosts.length - 1
+    ? sortedPosts[currentIndex + 1]
+    : undefined;
+
+const currentTags = post.data.tags ?? [];
+const relatedPosts = sortedPosts
+  .filter((entry) => entry.id !== post.id)
+  .map((entry) => {
+    const entryTags = entry.data.tags ?? [];
+    const sharedTagCount = entryTags.filter((tag) =>
+      currentTags.includes(tag),
+    ).length;
+
+    return {
+      entry,
+      sharedTagCount,
+    };
+  })
+  .filter((item) => item.sharedTagCount > 0)
+  .sort((a, b) => {
+    if (b.sharedTagCount !== a.sharedTagCount)
+      return b.sharedTagCount - a.sharedTagCount;
+    return b.entry.data.date.valueOf() - a.entry.data.date.valueOf();
+  })
+  .slice(0, 3)
+  .map((item) => item.entry);
+
+const stats = readingTime(post.body as string);
+const minutesRead = Math.ceil(stats.minutes);
+---
+
+<BaseLayout
+  title={`${post.data.title} | Antar Logs`}
+  description={post.data.description}
+  type="article"
+>
+  <article>
+    <h1>{post.data.title}</h1>
+
+    <p>
+      <small>
+        {
+          post.data.date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        }
+        {" · "}
+        {minutesRead} min read
+      </small>
+    </p>
+
+    {
+      post.data.tags && (
+        <p>
+          <small>
+            Tags:{" "}
+            {post.data.tags.map((tag, index) => (
+              <>
+                <a href={`/tags/${encodeURIComponent(tag)}`}>#{tag}</a>
+                {index < post.data.tags.length - 1 ? " " : ""}
+              </>
+            ))}
+          </small>
+        </p>
+      )
+    }
+
+    <hr />
+
+    <Content />
+
+    {
+      (newerPost || olderPost) && (
+        <>
+          <hr />
+          <nav aria-label="Post navigation">
+            <h2>Continue reading</h2>
+            <ul>
+              {newerPost && (
+                <li>
+                  <a href={`/blog/${newerPost.id}`}>
+                    Newer post: {newerPost.data.title}
+                  </a>
+                </li>
+              )}
+              {olderPost && (
+                <li>
+                  <a href={`/blog/${olderPost.id}`}>
+                    Older post: {olderPost.data.title}
+                  </a>
+                </li>
+              )}
+            </ul>
+          </nav>
+        </>
+      )
+    }
+
+    {
+      relatedPosts.length > 0 && (
+        <>
+          <hr />
+          <section aria-labelledby="related-posts-heading">
+            <h2 id="related-posts-heading">Related posts</h2>
+            <ul>
+              {relatedPosts.map((relatedPost) => (
+                <li>
+                  <a href={`/blog/${relatedPost.id}`}>
+                    {relatedPost.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      )
+    }
+
+    <hr />
+    <p>
+      <a href="/">Back to all posts</a>
+    </p>
+  </article>
+</BaseLayout>

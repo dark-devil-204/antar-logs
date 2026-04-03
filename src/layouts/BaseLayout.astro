@@ -1,0 +1,96 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  type?: "website" | "article";
+}
+const {
+  title,
+  description = "A log of things I build, break, and understand.",
+  type = "website",
+} = Astro.props;
+
+const canonicalURL = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : Astro.url.toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:site_name" content="Antar Logs" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="RSS"
+      href="/rss.xml"
+    />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    <!-- Remove the old <link> tag – we import CSS below -->
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="site-title">
+          <a href="/">~/antar-logs</a>
+        </div>
+        <p class="site-desc">text-only · no tracking · rss-worthy</p>
+
+        <p class="site-links">
+          <a href="https://github.com/AntarMukhopadhyaya" target="_blank"
+            >github</a
+          > ·
+          <a href="https://x.com/antarmukherjee">x</a> ·
+          <a href="https://www.linkedin.com/in/antar-mukhopadhyaya-04b026261/"
+            >linkedin</a
+          > ·
+          <a href="mailto:mukhopadhyayaantar@gmail.com">email</a>
+        </p>
+        <nav>
+          <a href="/">home</a>
+        </nav>
+        <hr />
+      </header>
+      <main>
+        <slot />
+      </main>
+      <footer>
+        <hr />
+        <p>© {new Date().getFullYear()} — antar logs</p>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  @import "../styles/global.css";
+  .site-about {
+    margin: 1rem 0 0.5rem 0;
+  }
+  .site-links {
+    letter-spacing: -0.2px;
+  }
+  .site-links::before {
+    content: "$ ";
+    color: #eb99a1;
+  }
+</style>

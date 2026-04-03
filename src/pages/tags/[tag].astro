@@ -1,0 +1,73 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import readingTime from "reading-time";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+
+  const tags = new Set();
+
+  posts.forEach((post) => {
+    post.data.tags?.forEach((tag) => tags.add(tag));
+  });
+
+  return Array.from(tags).map((tag) => ({
+    params: { tag },
+  }));
+}
+
+const { tag } = Astro.params;
+
+const posts = (await getCollection("blog"))
+  .filter((post) => post.data.tags?.includes(tag))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout
+  title={`#${tag} | Antar Logs`}
+  description={`Posts tagged with ${tag} on Antar Logs.`}
+>
+  <h1>#{tag}</h1>
+  <p>
+    <small
+      >{posts.length} post{posts.length === 1 ? "" : "s"} in this topic</small
+    >
+  </p>
+
+  <ul>
+    {
+      posts.map((post) => {
+        const stats = readingTime(post.body as string);
+
+        return (
+          <li>
+            <article>
+              <h2>
+                <a href={`/blog/${post.id}`}>{post.data.title}</a>
+              </h2>
+              <p>
+                <small>
+                  <time datetime={post.data.date.toISOString()}>
+                    {post.data.date.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                  {" · "}
+                  {Math.ceil(stats.minutes)} min read
+                </small>
+              </p>
+              <p>{post.data.description}</p>
+            </article>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <p>
+    <a href="/">View all posts</a>
+  </p>
+</BaseLayout>
