@@ -1,4 +1,7 @@
 ---
+import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
+
 export interface Props {
   title: string;
   description?: string;
@@ -53,7 +56,9 @@ const canonicalURL = Astro.site
         <div class="site-title">
           <a href="/">~/antar-logs</a>
         </div>
-        <p class="site-desc">text-only · no tracking · rss-worthy</p>
+        <p class="site-desc">
+          text-only · no tracking · <a href="/rss.xml">rss-worthy</a>
+        </p>
 
         <p class="site-links">
           <a href="https://github.com/AntarMukhopadhyaya" target="_blank"
@@ -78,6 +83,8 @@ const canonicalURL = Astro.site
         <p>© {new Date().getFullYear()} — antar logs</p>
       </footer>
     </div>
+    <Analytics />
+    <SpeedInsights />
   </body>
 </html>
 
